@@ -1,8 +1,8 @@
-# 🧙‍♂️ Traccar PostgreSQL Spellbook  
+# 🧙‍♂️ Traccar Admin's Spellbook  
 *A collection of SQL commands for common Traccar admin tasks. My cheat sheet for a PostgreSQL-backed server.*  
 
-## 🔌 Database Connection
-```postgresql 
+## 🔌 PostgreSQL Database Connection
+```sql 
 psql -U traccar -d traccar -h localhost
 ```
 
@@ -11,7 +11,7 @@ psql -U traccar -d traccar -h localhost
 
 Run these commands sequentially:
 
-```postgresql 
+```sql 
 -- Delete old positions (keeping linked device positions)
 DELETE FROM tc_positions 
 WHERE fixTime < (NOW() - INTERVAL '40 days') 
@@ -26,7 +26,7 @@ WHERE eventTime < (NOW() - INTERVAL '40 days');
 
 Via phppgadmin or command line:
 
-```postgresql 
+```sql 
 -- Count positions
 SELECT COUNT(*) FROM tc_positions;
 
@@ -38,7 +38,7 @@ SELECT COUNT(*) FROM tc_events;
 
 ### 🔍 Top 50 Devices by Record Count
 
-```postgresql 
+```sql 
 SELECT deviceid, COUNT(*) AS record_count
 FROM tc_positions
 GROUP BY deviceid
@@ -48,7 +48,7 @@ LIMIT 50;
 
 ### 📟 Identify Device & Owner
 
-```postgresql 
+```sql 
 -- Device details
 SELECT * FROM tc_devices 
 WHERE id = your_device_id;
@@ -62,7 +62,7 @@ WHERE deviceid = your_device_id;
 
 ### 1️⃣ Find Devices with >1M Records
 
-```postgresql 
+```sql 
 SELECT deviceid FROM tc_positions 
 GROUP BY deviceid 
 HAVING COUNT(*) > 1000000;
@@ -70,7 +70,7 @@ HAVING COUNT(*) > 1000000;
 
 ### 2️⃣ Manual Cleanup (e.g., Device ID 123)
 
-```postgresql
+```sql
 DELETE FROM tc_positions
 WHERE fixTime < (NOW() - INTERVAL '5 days')
 AND id NOT IN (SELECT positionId FROM tc_devices WHERE positionId IS NOT NULL)
@@ -79,7 +79,7 @@ AND deviceid = 123;
 
 ### ⚡ Automated Cleanup (Combined Query)
 
-```postgresql
+```sql
 -- Create temp table for high-volume devices
 CREATE TEMP TABLE temp_deviceids AS 
 SELECT deviceid FROM tc_positions 
